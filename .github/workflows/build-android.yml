@@ -1,6 +1,7 @@
-# Build Android APK and upload as workflow artifact + release asset.
-# - If Android signing secrets are configured, builds SIGNED release APK.
-# - Otherwise falls back to debug APK (for test installs only).
+# Build Android and upload as workflow artifacts + release assets.
+# - If Android signing secrets are configured, builds a SIGNED release APK
+#   (for sideloading) AND a SIGNED .aab bundle (for Google Play upload).
+# - Otherwise falls back to a debug APK only (for test installs).
 #
 # Triggers: push to main, or manual (workflow_dispatch).
 #
@@ -83,9 +84,10 @@ jobs:
              [ -n "${ANDROID_KEYSTORE_PASSWORD}" ] && \
              [ -n "${ANDROID_KEY_ALIAS}" ] && \
              [ -n "${ANDROID_KEY_PASSWORD}" ]; then
-            ./gradlew assembleRelease --no-daemon --stacktrace
+            ./gradlew assembleRelease bundleRelease --no-daemon --stacktrace
             echo "APK_PATH=android/app/build/outputs/apk/release/app-release.apk" >> "$GITHUB_ENV"
             echo "APK_LABEL=release" >> "$GITHUB_ENV"
+            echo "AAB_PATH=android/app/build/outputs/bundle/release/app-release.aab" >> "$GITHUB_ENV"
           else
             ./gradlew assembleDebug --no-daemon --stacktrace
             echo "APK_PATH=android/app/build/outputs/apk/debug/app-debug.apk" >> "$GITHUB_ENV"
@@ -111,10 +113,32 @@ jobs:
           gh release upload "$TAG" "${APK_PATH}" --clobber
           echo "Uploaded Android ${APK_LABEL} APK to release $TAG"
 
+      - name: Upload AAB (Play Store bundle) artifact
+        if: env.AAB_PATH != ''
+        uses: actions/upload-artifact@v6
+        with:
+          name: wojakcoinwallet-android-aab-${{ github.run_number }}-${{ github.sha }}
+          path: ${{ env.AAB_PATH }}
+          if-no-files-found: error
+
+      - name: Add AAB to GitHub Release
+        if: env.AAB_PATH != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="${{ env.RELEASE_TAG }}"
+          if ! gh release view "$TAG" &>/dev/null; then
+            echo "Release $TAG not found; skipping AAB upload."
+            exit 0
+          fi
+          gh release upload "$TAG" "${AAB_PATH}" --clobber
+          echo "Uploaded Android Play Store bundle (.aab) to release $TAG"
+
       - name: Summary
         run: |
           echo "### Android build (artifact + release upload)" >> "$GITHUB_STEP_SUMMARY"
           echo "APK type: **${APK_LABEL}**" >> "$GITHUB_STEP_SUMMARY"
-          echo "Download APK from this job's **Artifacts** section." >> "$GITHUB_STEP_SUMMARY"
+          echo "Play Store bundle (.aab): **${AAB_PATH:-not built (debug)}**" >> "$GITHUB_STEP_SUMMARY"
+          echo "Download the APK / AAB from this job's **Artifacts** section." >> "$GITHUB_STEP_SUMMARY"
           echo "Release target: \`${{ env.RELEASE_TAG }}\` (if present)." >> "$GITHUB_STEP_SUMMARY"
           echo "SHA: \`${{ github.sha }}\`" >> "$GITHUB_STEP_SUMMARY"
