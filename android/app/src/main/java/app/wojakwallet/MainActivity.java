@@ -1,4 +1,4 @@
-package cash.wojakcoin.wallet;
+package app.wojakwallet;
 
 import com.getcapacitor.BridgeActivity;
 

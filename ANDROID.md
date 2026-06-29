@@ -88,7 +88,7 @@ The signed APK will be in `android/app/build/outputs/apk/`.
 To ship updates so **existing users keep their wallet and app data**:
 
 1. **Keep `applicationId` the same**  
-   In `android/app/build.gradle`, leave `applicationId "cash.wojakcoin.wallet"` unchanged. Changing it makes Android treat the app as a new one and users lose data.
+   In `android/app/build.gradle`, leave `applicationId "app.wojakwallet"` unchanged. Changing it makes Android treat the app as a new one and users lose data.
 
 2. **Sign with the same keystore**  
    Every release APK must be signed with the **same** keystore you used for the first release. Otherwise the system won’t allow an update and may treat it as a different app.
