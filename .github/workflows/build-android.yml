@@ -23,7 +23,7 @@ env:
   # https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
   # GitHub Release tag for `gh release upload` (create the release if missing).
-  RELEASE_TAG: v1.4.1
+  RELEASE_TAG: v1.4.2
 
 jobs:
   build-android:

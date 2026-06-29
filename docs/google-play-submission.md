@@ -1,10 +1,10 @@
 # Google Play submission — WojakCoin Wallet
 
-Ready-to-paste content and answers for publishing `cash.wojakcoin.wallet` to the
+Ready-to-paste content and answers for publishing `app.wojakwallet` to the
 Google Play Store. Pair this with the signed **`app-release.aab`** attached to each
 release (the build workflow produces it automatically when signing secrets are set).
 
-- **Package:** `cash.wojakcoin.wallet`
+- **Package:** `app.wojakwallet`
 - **Privacy policy:** https://wojakcoin.cash/androidprivacy
 - **Contact:** wojakcoin2017@gmail.com
 - **Category:** Finance

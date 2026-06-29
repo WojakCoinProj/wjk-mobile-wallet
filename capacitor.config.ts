@@ -1,7 +1,7 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'cash.wojakcoin.wallet',
+  appId: 'app.wojakwallet',
   appName: 'Wojakcoinwallet',
   webDir: 'out',
   server: {
